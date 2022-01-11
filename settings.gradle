@@ -1,1 +1,7 @@
+sourceControl {
+    gitRepository("https://github.com/HellcrowAndrey/gmail-starter.git") {
+        producesModule('com.github:gmail-starter')
+    }
+}
+
 rootProject.name = 'notifications'

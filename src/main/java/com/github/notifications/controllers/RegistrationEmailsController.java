@@ -14,7 +14,7 @@ public class RegistrationEmailsController {
 
     @MessageMapping(value = "registration-email")
     public void registrationEmail(EmailRequest payload) {
-        this.registrationEmailsService.send();
+        this.registrationEmailsService.sendRegistrationEmail(payload);
     }
 
 }

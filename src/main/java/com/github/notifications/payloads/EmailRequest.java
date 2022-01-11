@@ -15,6 +15,8 @@ public class EmailRequest {
 
     private String from;
 
-    private Map<Object, Object> configurations;
+    private String subject;
+
+    private Map<String, Object> configurations;
 
 }

@@ -1,0 +1,14 @@
+server:
+  port: 8181
+emails:
+  app:
+    default:
+      enabled: true
+    name: email-api-json
+    credentials: ${user.home}/IdeaProjects/dark-horse/notifications/credentials/credentials.json
+    accessType: online
+    token:
+      directory:
+        path: credentials/tokens
+    userId: bakamakafoqq@gmail.com
+    port: 8888
