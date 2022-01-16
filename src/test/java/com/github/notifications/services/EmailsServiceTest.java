@@ -21,7 +21,8 @@ import static com.github.notifications.services.EmailsServiceMocks.*;
 
 @SpringBootTest(classes = EmailServiceApplicationContextConfig.class)
 @TestPropertySource(properties =
-        "spring.autoconfigure.exclude=com.github.gmail.config.EmailConfig")
+        "spring.autoconfigure.exclude=com.github.gmail.config.EmailConfig"
+)
 class EmailsServiceTest {
 
     private final EmailSenderService emailSenderServiceForTestCases;

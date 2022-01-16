@@ -9,13 +9,13 @@ import reactor.core.publisher.Mono;
 
 @Controller
 @RequiredArgsConstructor
-public class RegistrationEmailsController {
+public class EmailsRController {
 
-    private final EmailsService registrationEmailsService;
+    private final EmailsService emailsService;
 
     @MessageMapping(value = "emails")
-    public Mono<Void> registrationEmail(EmailRequest payload) {
-        return this.registrationEmailsService.sendEmail(payload);
+    public Mono<Void> sendEmail(EmailRequest payload) {
+        return this.emailsService.sendEmail(payload);
     }
 
 }
