@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import reactor.core.publisher.Mono;
 
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
@@ -17,27 +18,24 @@ import static com.github.gmail.utils.EmailMessageUtils.ofEmailWithText;
 
 @Service
 @RequiredArgsConstructor
-public class RegistrationEmailsService {
-
-    private static final String REGISTRATION_EMAIL_TEMPLATE = "registration-email";
+public class EmailsService {
 
     private final EmailSenderService emailSender;
 
     private final TemplateEngine templateEngine;
 
-    public void sendRegistrationEmail(EmailRequest request) {
-        var template = loadTemplate(request.getConfigurations());
+    public Mono<Void> sendEmail(EmailRequest request) {
         MimeMessage payload = ofEmailWithText(
                 request.getTo(), request.getFrom(),
-                request.getSubject(), template,
+                request.getSubject(), loadTemplate(request.getTemplate(), request.getConfigurations()),
                 StandardCharsets.UTF_8.name(), SUBTYPE_HTML
         );
-        this.emailSender.send(payload);
+        return Mono.just(this.emailSender.send(payload)).then();
     }
 
-    private String loadTemplate(Map<String, Object> configurations) {
+    private String loadTemplate(String template, Map<String, Object> configurations) {
         return this.templateEngine.process(
-                REGISTRATION_EMAIL_TEMPLATE,
+                template,
                 new Context(Locale.getDefault(), configurations)
         );
     }

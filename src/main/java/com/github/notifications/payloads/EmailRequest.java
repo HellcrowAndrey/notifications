@@ -11,6 +11,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class EmailRequest {
 
+    private String template;
+
     private String to;
 
     private String from;

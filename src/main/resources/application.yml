@@ -1,5 +1,3 @@
-server:
-  port: 8181
 emails:
   app:
     default:
@@ -12,3 +10,8 @@ emails:
         path: credentials/tokens
     userId: bakamakafoqq@gmail.com
     port: 8888
+spring:
+  rsocket:
+    server:
+      port: 7000
+      transport: tcp
