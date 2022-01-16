@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  main:
+    lazy-initialization: true
+eureka:
+  client:
+    enabled: false
