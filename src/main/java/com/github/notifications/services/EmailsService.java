@@ -1,16 +1,19 @@
 package com.github.notifications.services;
 
+import com.github.gmail.exceptions.ExecuteSendEmailException;
 import com.github.gmail.services.EmailSenderService;
 import com.github.notifications.payloads.EmailRequest;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import reactor.core.publisher.Mono;
 
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import java.util.Map;
 
 import static com.github.gmail.utils.EmailMessageUtils.SUBTYPE_HTML;
@@ -22,7 +25,7 @@ public class EmailsService {
 
     private final EmailSenderService emailSender;
 
-    private final TemplateEngine templateEngine;
+    private final Configuration templateEngine;
 
     public Mono<Void> sendEmail(EmailRequest request) {
         MimeMessage payload = ofEmailWithText(
@@ -33,11 +36,13 @@ public class EmailsService {
         return Mono.just(this.emailSender.send(payload)).then();
     }
 
-    private String loadTemplate(String template, Map<String, Object> configurations) {
-        return this.templateEngine.process(
-                template,
-                new Context(Locale.getDefault(), configurations)
-        );
+    private String loadTemplate(String templateName, Map<String, Object> configurations) {
+        try {
+            Template template = this.templateEngine.getTemplate(templateName + ".ftl");
+            return FreeMarkerTemplateUtils.processTemplateIntoString(template, configurations);
+        } catch (IOException | TemplateException e) {
+            throw new ExecuteSendEmailException(e.getMessage());
+        }
     }
 
 }
