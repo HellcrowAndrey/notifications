@@ -38,7 +38,7 @@ public class EmailsService {
 
     private String loadTemplate(String templateName, Map<String, Object> configurations) {
         try {
-            Template template = this.templateEngine.getTemplate(templateName + ".ftl");
+            Template template = this.templateEngine.getTemplate(String.format("%s%s", templateName,".ftl"));
             return FreeMarkerTemplateUtils.processTemplateIntoString(template, configurations);
         } catch (IOException | TemplateException e) {
             throw new ExecuteSendEmailException(e.getMessage());

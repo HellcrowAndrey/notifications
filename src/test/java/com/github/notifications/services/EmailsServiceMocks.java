@@ -2,15 +2,14 @@ package com.github.notifications.services;
 
 import com.github.notifications.payloads.EmailRequest;
 import com.google.api.services.gmail.model.Message;
-import org.thymeleaf.context.Context;
+import freemarker.template.Template;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 public class EmailsServiceMocks {
 
-    public static final String emailTemplate = "registration-email";
+    public static final String emailTemplate = "registration-email.ftl";
 
     public static EmailRequest validPayload() {
         return new EmailRequest(
@@ -20,10 +19,6 @@ public class EmailsServiceMocks {
                 "Supper subject",
                 Map.of()
         );
-    }
-
-    public static Context contextForLoadTemplate() {
-        return new Context(Locale.getDefault(), Map.of());
     }
 
     public static String template() {

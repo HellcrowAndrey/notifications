@@ -2,10 +2,10 @@ package com.github.notifications.configs;
 
 import com.github.gmail.services.EmailSenderService;
 import com.github.notifications.services.EmailsService;
+import freemarker.template.Configuration;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.thymeleaf.TemplateEngine;
 
 @TestConfiguration
 public class EmailServiceApplicationContextConfig {
@@ -16,13 +16,13 @@ public class EmailServiceApplicationContextConfig {
     }
 
     @Bean
-    public TemplateEngine templateEngineForTestCases() {
-        return Mockito.mock(TemplateEngine.class);
+    public Configuration templateEngineForTestCases() {
+        return Mockito.mock(Configuration.class);
     }
 
     @Bean
     public EmailsService emailsServiceForTestCases(EmailSenderService emailSenderServiceForTestCases,
-                                                   TemplateEngine templateEngineForTestCases) {
+                                                   Configuration templateEngineForTestCases) {
         return new EmailsService(
                 emailSenderServiceForTestCases,
                 templateEngineForTestCases

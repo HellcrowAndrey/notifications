@@ -4,18 +4,23 @@ import com.github.gmail.exceptions.ExecuteSendEmailException;
 import com.github.gmail.services.EmailSenderService;
 import com.github.notifications.configs.EmailServiceApplicationContextConfig;
 import com.github.notifications.payloads.EmailRequest;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.thymeleaf.TemplateEngine;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import reactor.test.StepVerifier;
+
+import java.io.IOException;
 
 import static com.github.notifications.services.EmailsServiceMocks.*;
 
@@ -27,13 +32,15 @@ class EmailsServiceTest {
 
     private final EmailSenderService emailSenderServiceForTestCases;
 
-    private final TemplateEngine templateEngineForTestCases;
+    private final Configuration templateEngineForTestCases;
 
     private final EmailsService emailsServiceForTestCases;
 
+    private MockedStatic<FreeMarkerTemplateUtils> freeMarketUtils;
+
     @Autowired
     public EmailsServiceTest(EmailSenderService emailSenderServiceForTestCases,
-                             TemplateEngine templateEngineForTestCases,
+                             Configuration templateEngineForTestCases,
                              EmailsService emailsServiceForTestCases) {
         this.emailSenderServiceForTestCases = emailSenderServiceForTestCases;
         this.templateEngineForTestCases = templateEngineForTestCases;
@@ -42,17 +49,23 @@ class EmailsServiceTest {
 
     @BeforeEach
     void setUp() {
+        this.freeMarketUtils = Mockito.mockStatic(FreeMarkerTemplateUtils.class);
     }
 
     @AfterEach
     void tearDown() {
+        Mockito.reset(this.emailSenderServiceForTestCases, this.templateEngineForTestCases);
+        this.freeMarketUtils.close();
     }
 
     @Test
-    void givenEmailRequest_whenSendEmail_thenReturnVoid() {
+    void givenEmailRequest_whenSendEmail_thenReturnVoid() throws IOException {
         EmailRequest payload = validPayload();
-        BDDMockito.given(this.templateEngineForTestCases.process(emailTemplate, contextForLoadTemplate()))
-                .willReturn(template());
+        Template templateMock = Mockito.mock(Template.class);
+        BDDMockito.given(this.templateEngineForTestCases.getTemplate(emailTemplate))
+                .willReturn(templateMock);
+        this.freeMarketUtils.when(() -> FreeMarkerTemplateUtils.processTemplateIntoString(templateMock, payload.getConfigurations()))
+                .thenReturn(template());
         Mockito.when(this.emailSenderServiceForTestCases.send(ArgumentMatchers.any()))
                 .thenReturn(message());
         StepVerifier.create(this.emailsServiceForTestCases.sendEmail(payload))
@@ -60,13 +73,19 @@ class EmailsServiceTest {
     }
 
     @Test
-    void givenEmailRequest_whenSendEmail_thenThrowExecuteSendEmailException() {
+    void givenEmailRequest_whenSendEmail_thenThrowExecuteSendEmailException() throws IOException {
         EmailRequest payload = validPayload();
-        BDDMockito.given(this.templateEngineForTestCases.process(emailTemplate, contextForLoadTemplate()))
-                .willReturn(template());
+        Template templateMock = Mockito.mock(Template.class);
+        BDDMockito.given(this.templateEngineForTestCases.getTemplate(emailTemplate))
+                .willReturn(templateMock);
+        this.freeMarketUtils.when(() -> FreeMarkerTemplateUtils.processTemplateIntoString(templateMock, payload.getConfigurations()))
+                .thenReturn(template());
         Mockito.when(this.emailSenderServiceForTestCases.send(ArgumentMatchers.any()))
                 .thenThrow(new ExecuteSendEmailException());
-        Assertions.assertThrows(ExecuteSendEmailException.class, () -> this.emailsServiceForTestCases.sendEmail(payload));
+        Assertions.assertThrows(
+                ExecuteSendEmailException.class,
+                () -> this.emailsServiceForTestCases.sendEmail(payload)
+        );
     }
 
 }
